@@ -7,7 +7,7 @@ import (
 // GetDns get domain dns
 func GetDns(ctx context.Context, domain string, dns ...string) ([]string, error) {
 	r := getResolver(ctx, dns...)
-	ips, err := r.LookupHost(ctx, domain)
+	ips, err := r.LookupHost(ctx, parseDomain(domain))
 	if err != nil {
 		return nil, err
 	}

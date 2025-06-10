@@ -12,7 +12,13 @@ func TestGetDns(t *testing.T) {
 	tt := zlsgo.NewTest(t)
 	ctx := context.Background()
 
-	dns, err := domain.GetDns(ctx, "www.google.com")
+	dns, err := domain.GetDns(ctx, "https://www.google.com")
+	if err != nil {
+		tt.Fatal(err)
+	}
+	tt.Log(dns)
+
+	dns, err = domain.GetDns(ctx, "www.google.com")
 	if err != nil {
 		tt.Fatal(err)
 	}

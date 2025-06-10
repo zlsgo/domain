@@ -6,7 +6,7 @@ import (
 
 func GetTxt(ctx context.Context, domain string, dns ...string) ([]string, error) {
 	r := getResolver(ctx, dns...)
-	txts, err := r.LookupTXT(ctx, domain)
+	txts, err := r.LookupTXT(ctx, parseDomain(domain))
 	if err != nil {
 		return nil, err
 	}
