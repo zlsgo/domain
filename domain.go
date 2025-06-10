@@ -24,8 +24,9 @@ func getResolver(ctx context.Context, dns ...string) *net.Resolver {
 }
 
 func parseDomain(url string) string {
-	if !strings.Contains(url, "://") {
-		return url
+	s := strings.Split(url, "://")
+	if len(s) == 2 {
+		return strings.SplitN(s[1], "/", 2)[0]
 	}
-	return strings.Split(url, "://")[1]
+	return strings.SplitN(url, "/", 2)[0]
 }

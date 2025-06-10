@@ -6,14 +6,32 @@ import (
 
 // GetDns get domain dns
 func GetDns(ctx context.Context, domain string, dns ...string) ([]string, error) {
-	r := getResolver(ctx, dns...)
-	ips, err := r.LookupHost(ctx, parseDomain(domain))
+	return getDns(ctx, domain, "ip", dns...)
+}
+
+func GetDnsIPv4(ctx context.Context, domain string, dns ...string) ([]string, error) {
+	return getDns(ctx, domain, "ip4", dns...)
+}
+
+func GetDnsIPv6(ctx context.Context, domain string, dns ...string) ([]string, error) {
+	return getDns(ctx, domain, "ip6", dns...)
+}
+
+func getDns(ctx context.Context, domain string, network string, dns ...string) ([]string, error) {
+	pDomain := parseDomain(domain)
+
+	ipAddrs, err := getResolver(ctx, dns...).LookupIP(ctx, network, pDomain)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(ips) == 0 {
-		return nil, nil
+	if len(ipAddrs) == 0 {
+		return []string{}, nil
+	}
+
+	ips := make([]string, len(ipAddrs))
+	for i, ip := range ipAddrs {
+		ips[i] = ip.String()
 	}
 
 	return ips, nil

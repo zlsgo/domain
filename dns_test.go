@@ -18,6 +18,12 @@ func TestGetDns(t *testing.T) {
 	}
 	tt.Log(dns)
 
+	dns, err = domain.GetDns(ctx, "https://www.google.com/xxx")
+	if err != nil {
+		tt.Fatal(err)
+	}
+	tt.Log(dns)
+
 	dns, err = domain.GetDns(ctx, "www.google.com")
 	if err != nil {
 		tt.Fatal(err)
@@ -25,6 +31,18 @@ func TestGetDns(t *testing.T) {
 	tt.Log(dns)
 
 	ips, err := domain.GetDns(ctx, "www.google.com", "8.8.8.8")
+	if err != nil {
+		tt.Fatal(err)
+	}
+	tt.Log(ips)
+
+	ips, err = domain.GetDnsIPv4(ctx, "www.google.com")
+	if err != nil {
+		tt.Fatal(err)
+	}
+	tt.Log(ips)
+
+	ips, err = domain.GetDnsIPv6(ctx, "www.google.com")
 	if err != nil {
 		tt.Fatal(err)
 	}

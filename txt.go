@@ -8,11 +8,11 @@ func GetTxt(ctx context.Context, domain string, dns ...string) ([]string, error)
 	r := getResolver(ctx, dns...)
 	txts, err := r.LookupTXT(ctx, parseDomain(domain))
 	if err != nil {
-		return nil, err
+		return []string{}, err
 	}
 
 	if len(txts) == 0 {
-		return nil, nil
+		return []string{}, nil
 	}
 
 	return txts, nil
