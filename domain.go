@@ -2,25 +2,27 @@ package domain
 
 import (
 	"context"
-	"net"
 	"strings"
 )
 
-func getResolver(ctx context.Context, dns ...string) *net.Resolver {
-	if len(dns) > 0 && dns[0] != "" {
-		return &net.Resolver{
-			PreferGo: true,
-			Dial: func(_ context.Context, network, address string) (net.Conn, error) {
-				d := net.Dialer{}
-				dnsServer := dns[0]
-				if !strings.Contains(dnsServer, ":") {
-					dnsServer += ":53"
-				}
-				return d.DialContext(ctx, network, dnsServer)
-			},
-		}
-	}
-	return net.DefaultResolver
+// GetDns performs a DNS lookup for the given domain and returns all available IP addresses (both IPv4 and IPv6).
+func GetDns(ctx context.Context, domain string, dns ...string) ([]string, error) {
+	return NewClient(dns...).GetDns(ctx, domain)
+}
+
+// GetDnsIPv4 performs a DNS lookup for the given domain and returns only IPv4 addresses.
+func GetDnsIPv4(ctx context.Context, domain string, dns ...string) ([]string, error) {
+	return NewClient(dns...).GetDnsIPv4(ctx, domain)
+}
+
+// GetDnsIPv6 performs a DNS lookup for the given domain and returns only IPv6 addresses.
+func GetDnsIPv6(ctx context.Context, domain string, dns ...string) ([]string, error) {
+	return NewClient(dns...).GetDnsIPv6(ctx, domain)
+}
+
+// GetTxt retrieves all TXT records for the given domain.
+func GetTxt(ctx context.Context, domain string, dns ...string) ([]string, error) {
+	return NewClient(dns...).GetTxt(ctx, domain)
 }
 
 func parseDomain(url string) string {

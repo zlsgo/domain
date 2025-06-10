@@ -12,37 +12,39 @@ func TestGetDns(t *testing.T) {
 	tt := zlsgo.NewTest(t)
 	ctx := context.Background()
 
-	dns, err := domain.GetDns(ctx, "https://www.google.com")
+	client := domain.NewClient()
+	dns, err := client.GetDns(ctx, "https://www.google.com")
 	if err != nil {
 		tt.Fatal(err)
 	}
 	tt.Log(dns)
 
-	dns, err = domain.GetDns(ctx, "https://www.google.com/xxx")
+	dns, err = client.GetDns(ctx, "https://www.google.com/xxx")
 	if err != nil {
 		tt.Fatal(err)
 	}
 	tt.Log(dns)
 
-	dns, err = domain.GetDns(ctx, "www.google.com")
+	dns, err = client.GetDns(ctx, "www.google.com")
 	if err != nil {
 		tt.Fatal(err)
 	}
 	tt.Log(dns)
 
-	ips, err := domain.GetDns(ctx, "www.google.com", "8.8.8.8")
+	client = domain.NewClient("8.8.8.8")
+	ips, err := client.GetDns(ctx, "www.google.com")
 	if err != nil {
 		tt.Fatal(err)
 	}
 	tt.Log(ips)
 
-	ips, err = domain.GetDnsIPv4(ctx, "www.google.com")
+	ips, err = client.GetDnsIPv4(ctx, "www.google.com")
 	if err != nil {
 		tt.Fatal(err)
 	}
 	tt.Log(ips)
 
-	ips, err = domain.GetDnsIPv6(ctx, "www.google.com")
+	ips, err = client.GetDnsIPv6(ctx, "www.google.com")
 	if err != nil {
 		tt.Fatal(err)
 	}

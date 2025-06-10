@@ -4,11 +4,11 @@ import (
 	"context"
 )
 
-func GetTxt(ctx context.Context, domain string, dns ...string) ([]string, error) {
-	r := getResolver(ctx, dns...)
-	txts, err := r.LookupTXT(ctx, parseDomain(domain))
+// GetTxt retrieves the TXT records for a given domain.
+func (c *Client) GetTxt(ctx context.Context, domain string) ([]string, error) {
+	txts, err := c.resolver.LookupTXT(ctx, parseDomain(domain))
 	if err != nil {
-		return []string{}, err
+		return nil, err
 	}
 
 	if len(txts) == 0 {

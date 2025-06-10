@@ -4,16 +4,23 @@ import (
 	"context"
 	"testing"
 
-	"github.com/sohaha/zlsgo"
 )
 
 func TestGetTxt(t *testing.T) {
-	tt := zlsgo.NewTest(t)
 	ctx := context.Background()
+	domain := "qq.com"
 
-	txts, err := GetTxt(ctx, "google.com")
-	tt.Log(txts, err)
+	// test default dns
+	client := NewClient()
+	_, err := client.GetTxt(ctx, domain)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	txts, err = GetTxt(ctx, "google.com", "8.8.8.8")
-	tt.Log(txts, err)
+	// test custom dns
+	client = NewClient("1.1.1.1")
+	_, err = client.GetTxt(ctx, domain)
+	if err != nil {
+		t.Fatal(err)
+	}
 }

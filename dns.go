@@ -4,23 +4,25 @@ import (
 	"context"
 )
 
-// GetDns get domain dns
-func GetDns(ctx context.Context, domain string, dns ...string) ([]string, error) {
-	return getDns(ctx, domain, "ip", dns...)
+// GetDns performs a DNS lookup for the given domain and returns a slice of IP addresses.
+func (c *Client) GetDns(ctx context.Context, domain string) ([]string, error) {
+	return c.getDns(ctx, domain, "ip")
 }
 
-func GetDnsIPv4(ctx context.Context, domain string, dns ...string) ([]string, error) {
-	return getDns(ctx, domain, "ip4", dns...)
+// GetDnsIPv4 performs a DNS lookup for the given domain and returns a slice of IPv4 addresses.
+func (c *Client) GetDnsIPv4(ctx context.Context, domain string) ([]string, error) {
+	return c.getDns(ctx, domain, "ip4")
 }
 
-func GetDnsIPv6(ctx context.Context, domain string, dns ...string) ([]string, error) {
-	return getDns(ctx, domain, "ip6", dns...)
+// GetDnsIPv6 performs a DNS lookup for the given domain and returns a slice of IPv6 addresses.
+func (c *Client) GetDnsIPv6(ctx context.Context, domain string) ([]string, error) {
+	return c.getDns(ctx, domain, "ip6")
 }
 
-func getDns(ctx context.Context, domain string, network string, dns ...string) ([]string, error) {
+func (c *Client) getDns(ctx context.Context, domain string, network string) ([]string, error) {
 	pDomain := parseDomain(domain)
 
-	ipAddrs, err := getResolver(ctx, dns...).LookupIP(ctx, network, pDomain)
+	ipAddrs, err := c.resolver.LookupIP(ctx, network, pDomain)
 	if err != nil {
 		return nil, err
 	}
