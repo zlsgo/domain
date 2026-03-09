@@ -2,6 +2,8 @@ package domain_test
 
 import (
 	"context"
+	"errors"
+	"net"
 	"strings"
 	"testing"
 
@@ -98,4 +100,63 @@ func TestGetMulti(t *testing.T) {
 	}
 	t.Log(results)
 	t.Log(errs)
+}
+
+func TestGetDnsWithLiteralIPv4URL(t *testing.T) {
+	client := domain.NewClient()
+	ips, err := client.GetDns(context.Background(), "http://1.1.1.1:8080/path")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(ips) != 1 || ips[0] != "1.1.1.1" {
+		t.Fatalf("expected [1.1.1.1], but got %v", ips)
+	}
+}
+
+func TestGetDnsIPv6WithLiteralIPv4ReturnsAddrError(t *testing.T) {
+	client := domain.NewClient()
+	_, err := client.GetDnsIPv6(context.Background(), "1.1.1.1")
+	if err == nil {
+		t.Fatal("expected error, but got nil")
+	}
+
+	var addrErr *net.AddrError
+	if !errors.As(err, &addrErr) {
+		t.Fatalf("expected net.AddrError, but got %T", err)
+	}
+}
+
+func TestGetDnsWithLiteralIPv6URL(t *testing.T) {
+	client := domain.NewClient()
+	ips, err := client.GetDns(context.Background(), "https://[2606:4700:4700::1111]:8443/dns-query")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(ips) != 1 || ips[0] != "2606:4700:4700::1111" {
+		t.Fatalf("expected [2606:4700:4700::1111], but got %v", ips)
+	}
+}
+
+func TestGetDnsIPv4WithLiteralIPv4URL(t *testing.T) {
+	client := domain.NewClient()
+	ips, err := client.GetDnsIPv4(context.Background(), "http://1.1.1.1:8080/path")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(ips) != 1 || ips[0] != "1.1.1.1" {
+		t.Fatalf("expected [1.1.1.1], but got %v", ips)
+	}
+}
+
+func TestGetDnsIPv4WithLiteralIPv6URLReturnsAddrError(t *testing.T) {
+	client := domain.NewClient()
+	_, err := client.GetDnsIPv4(context.Background(), "https://[2606:4700:4700::1111]:8443/dns-query")
+	if err == nil {
+		t.Fatal("expected error, but got nil")
+	}
+
+	var addrErr *net.AddrError
+	if !errors.As(err, &addrErr) {
+		t.Fatalf("expected net.AddrError, but got %T", err)
+	}
 }

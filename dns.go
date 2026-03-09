@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"net"
 	"sync"
 )
 
@@ -52,6 +53,10 @@ func (c *Client) GetMulti(ctx context.Context, domains []string) (map[string][]s
 }
 
 func (c *Client) getDns(ctx context.Context, domain string, network string) ([]string, error) {
+	if ip := parseLiteralIP(domain); ip != nil {
+		return literalIPResult(ip, network)
+	}
+
 	pDomain := parseDomain(domain)
 
 	ipAddrs, err := c.resolver.LookupIP(ctx, network, pDomain)
@@ -69,4 +74,21 @@ func (c *Client) getDns(ctx context.Context, domain string, network string) ([]s
 	}
 
 	return ips, nil
+}
+
+func literalIPResult(ip net.IP, network string) ([]string, error) {
+	switch network {
+	case "ip":
+		return []string{ip.String()}, nil
+	case "ip4":
+		if ip.To4() != nil {
+			return []string{ip.String()}, nil
+		}
+	case "ip6":
+		if ip.To4() == nil {
+			return []string{ip.String()}, nil
+		}
+	}
+
+	return nil, &net.AddrError{Err: "no suitable address found", Addr: ip.String()}
 }

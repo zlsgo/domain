@@ -3,6 +3,7 @@ package domain
 import (
 	"context"
 	"net"
+	"net/url"
 	"strings"
 )
 
@@ -59,10 +60,32 @@ func GetMulti(ctx context.Context, domains []string) (map[string][]string, []err
 	return defaultClient.GetMulti(ctx, domains)
 }
 
-func parseDomain(url string) string {
-	s := strings.Split(url, "://")
-	if len(s) == 2 {
-		return strings.SplitN(s[1], "/", 2)[0]
+func parseDomain(raw string) string {
+	value := strings.TrimSpace(raw)
+	if value == "" {
+		return ""
 	}
-	return strings.SplitN(url, "/", 2)[0]
+
+	if strings.Contains(value, "://") {
+		parsed, err := url.Parse(value)
+		if err == nil && parsed.Hostname() != "" {
+			return parsed.Hostname()
+		}
+	}
+
+	host := strings.SplitN(value, "/", 2)[0]
+	parsedHost, _, err := net.SplitHostPort(host)
+	if err == nil {
+		return parsedHost
+	}
+
+	if strings.HasPrefix(host, "[") && strings.HasSuffix(host, "]") {
+		return strings.TrimSuffix(strings.TrimPrefix(host, "["), "]")
+	}
+
+	return host
+}
+
+func parseLiteralIP(value string) net.IP {
+	return net.ParseIP(parseDomain(value))
 }
