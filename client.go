@@ -6,9 +6,19 @@ import (
 	"strings"
 )
 
+type resolver interface {
+	LookupAddr(ctx context.Context, addr string) ([]string, error)
+	LookupCNAME(ctx context.Context, host string) (string, error)
+	LookupIP(ctx context.Context, network, host string) ([]net.IP, error)
+	LookupMX(ctx context.Context, name string) ([]*net.MX, error)
+	LookupNS(ctx context.Context, name string) ([]*net.NS, error)
+	LookupSRV(ctx context.Context, service, proto, name string) (string, []*net.SRV, error)
+	LookupTXT(ctx context.Context, name string) ([]string, error)
+}
+
 // Client is a DNS client for performing lookups.
 type Client struct {
-	resolver *net.Resolver
+	resolver resolver
 }
 
 // NewClient creates a new DNS client.

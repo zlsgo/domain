@@ -1,14 +1,18 @@
-package domain_test
+package domain
 
 import (
 	"context"
 	"testing"
-
-	"github.com/zlsgo/domain"
 )
 
 func TestLookupAddr(t *testing.T) {
-	client := domain.NewClient()
+	client := &Client{
+		resolver: testResolver{
+			lookupAddr: func(context.Context, string) ([]string, error) {
+				return []string{"dns.google."}, nil
+			},
+		},
+	}
 	names, err := client.LookupAddr(context.Background(), "8.8.8.8")
 	if err != nil {
 		t.Fatal(err)
